@@ -1,0 +1,45 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    ports:
+      - 8083:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: openecoe_1234
+      MYSQL_DATABASE: openECOE_dev
+      MYSQL_USER: openecoe
+      MYSQL_PASSWORD: openecoe
+    cap_add:
+      - SYS_NICE
+    healthcheck:
+      test: "mysqladmin ping -p$$MYSQL_ROOT_PASSWORD"
+      timeout: 5s
+      retries: 3
+  ecoe:
+    image: openecoe/all-in-one:2022-10-03
+    ports:
+      - 8080:80
+      - 8081:1081
+      - 8082:1082
+    volumes:
+      - ./deploy/local.env:/app/api/.env
+    environment:
+      SECRET_KEY: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
+      BCRYPT_LOG_ROUNDS: 4
+      DEBUG: "True"
+      TESTING: "True"
+      LOG_TO_STDOUT: "True"
+      SQLALCHEMY_TRACK_MODIFICATIONS: "False"
+      API_AUTH: "False"
+      SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@mysql/openECOE_dev
+      CHRONO_ROUTE: http://localhost:8085
+      EMAIL: ecoe@umh.es
+      PASSWORD: Ki0uchee
+      FIRSTNAME: Open
+      SURNAME: ECOE
+      ORGANIZATION: UMH
+      ALEMBIC_UPGRADE: DO
+    depends_on:
+      mysql:
+        condition: service_healthy
+
