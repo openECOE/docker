@@ -16,7 +16,7 @@ services:
       timeout: 5s
       retries: 3
   ecoe:
-    image: openecoe/all-in-one:2022-10-03
+    image: openecoe/one-for-all:latest
     ports:
       - 8080:80
       - 8081:1081
@@ -30,9 +30,10 @@ services:
       TESTING: "True"
       LOG_TO_STDOUT: "True"
       SQLALCHEMY_TRACK_MODIFICATIONS: "False"
-      API_AUTH: "False"
+      API_AUTH: "True"
+      API_URL:  http://localhost:8081
       SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@mysql/openECOE_dev
-      CHRONO_ROUTE: http://localhost:8085
+      CHRONO_ROUTE: http://localhost:8082
       EMAIL: ecoe@umh.es
       PASSWORD: Ki0uchee
       FIRSTNAME: Open
