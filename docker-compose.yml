@@ -51,6 +51,8 @@ services:
       ALEMBIC_UPGRADE: DO
       RQ_REDIS_URL: 'redis://redis:6379/0'
     depends_on:
+      redis:
+        condition: service_started
       mysql:
         condition: service_healthy
 
