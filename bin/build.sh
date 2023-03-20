@@ -1,14 +1,36 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
-REPO=${1-openecoe/all-in-one}
-RELEASE=${2-$(date '+%Y-%m-%d')}
+# Valores predeterminados
+REPO="openecoe/one-for-all"
+RELEASE="$(date '+%Y-%m-%d')"
+ADDITIONAL_TAGS=()
 
-# docker build --no-cache -t $REPO:$RELEASE .
-docker build --build-arg RELEASE=$RELEASE -t $REPO:$RELEASE .
-
-for tag in ${@:3}
-do docker tag $REPO:$RELEASE $REPO:$tag-$RELEASE
+# Analizar las opciones y argumentos con nombre
+while getopts "r:R:t:" opt; do
+  case $opt in
+    r)
+      REPO="$OPTARG"
+      ;;
+    R)
+      RELEASE="$OPTARG"
+      ;;
+    t)
+      ADDITIONAL_TAGS+=("$OPTARG")
+      ;;
+    *)
+      echo "Uso: $0 [-r repo] [-R release] [-t additional_tag]..."
+      exit 1
+      ;;
+  esac
 done
 
+# Construir la imagen de Docker
+docker build -t "$REPO:$RELEASE" .
+
+# Etiquetar la imagen de Docker
+for tag in "${ADDITIONAL_TAGS[@]}"; do
+  docker tag "$REPO:$RELEASE" "$REPO:$tag"
+done
+ 
