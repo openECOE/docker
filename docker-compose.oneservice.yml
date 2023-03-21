@@ -2,7 +2,7 @@ version: '3'
 services:
   redis:
     image: redis:latest
-  mysql:
+  db:
     image: mysql:latest
     ports:
       - 8083:3306
@@ -17,7 +17,7 @@ services:
       - SYS_NICE
     healthcheck:
       test: "mysqladmin ping -p$$MYSQL_ROOT_PASSWORD"
-      timeout: 2s
+      timeout: 5s
       retries: 3
   openecoe:
     build:
@@ -25,11 +25,10 @@ services:
       dockerfile: Dockerfile
       args:
         - RELEASE=latest
-    image: openecoe/one-for-all:latest
+    image: openecoe:latest
     ports:
       - 8080:80
-      - 8081:1081
-      - 8082:1082
+      - 8081:5000
     environment:
       SECRET_KEY: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
       BCRYPT_LOG_ROUNDS: 4
@@ -39,7 +38,7 @@ services:
       SQLALCHEMY_TRACK_MODIFICATIONS: "False"
       API_AUTH: "True"
       API_URL:  http://localhost:8081
-      SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@mysql/openECOE_dev
+      SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@db/openECOE_dev
       CHRONO_ROUTE: http://localhost:8082
       EMAIL: ecoe@umh.es
       PASSWORD: Ki0uchee
@@ -51,6 +50,13 @@ services:
     depends_on:
       redis:
         condition: service_started
-      mysql:
+      db:
         condition: service_healthy
-
+  worker:
+    image: openecoe:latest
+    entrypoint: [ "flask", "rq", "worker"]
+    environment:
+      RQ_REDIS_URL: 'redis://redis:6379/0'
+    depends_on:
+      redis:
+        condition: service_started

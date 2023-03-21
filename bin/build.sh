@@ -3,7 +3,7 @@
 set -eu
 
 # Valores predeterminados
-REPO="openecoe/one-for-all"
+REPO="openecoe"
 RELEASE="$(date '+%Y-%m-%d')"
 ADDITIONAL_TAGS=()
 
@@ -27,7 +27,7 @@ while getopts "r:R:t:" opt; do
 done
 
 # Construir la imagen de Docker
-docker build -t "$REPO:$RELEASE" .
+docker build -t "$REPO:$RELEASE" --build-arg RELEASE=$RELEASE .
 
 # Etiquetar la imagen de Docker
 for tag in "${ADDITIONAL_TAGS[@]}"; do
