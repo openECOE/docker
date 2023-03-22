@@ -28,18 +28,17 @@ services:
     image: openecoe:latest
     ports:
       - 8080:80
-      - 8081:5000
     environment:
       SECRET_KEY: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
       BCRYPT_LOG_ROUNDS: 4
-      DEBUG: "True"
+      DEBUG: "False"
       TESTING: "False"
       LOG_TO_STDOUT: "True"
       SQLALCHEMY_TRACK_MODIFICATIONS: "False"
       API_AUTH: "True"
-      API_URL:  http://localhost:8081
+      API_URL:  http://localhost:8080/api
       SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@db/openECOE_dev
-      CHRONO_ROUTE: http://localhost:8082
+      CHRONO_ROUTE: http://localhost:8080/api/chrono
       EMAIL: ecoe@umh.es
       PASSWORD: Ki0uchee
       FIRSTNAME: Open
@@ -53,6 +52,11 @@ services:
       db:
         condition: service_healthy
   worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - RELEASE=latest
     image: openecoe:latest
     entrypoint: [ "flask", "rq", "worker"]
     environment:
