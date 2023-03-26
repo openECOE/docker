@@ -10,7 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: openecoe_1234
       MYSQL_DATABASE: openECOE_dev
       MYSQL_USER: openecoe
-      MYSQL_PASSWORD: openecoe
+      MYSQL_PASSWORD: openecoe_pass
     volumes:
       - ./deploy/data:/docker-entrypoint-initdb.d
     cap_add:
@@ -29,38 +29,31 @@ services:
     ports:
       - 8080:80
     environment:
-      SECRET_KEY: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
-      BCRYPT_LOG_ROUNDS: 4
-      DEBUG: "False"
-      TESTING: "False"
-      LOG_TO_STDOUT: "True"
-      SQLALCHEMY_TRACK_MODIFICATIONS: "False"
-      API_AUTH: "True"
-      API_URL:  http://localhost:8080/api
-      SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@db/openECOE_dev
-      CHRONO_ROUTE: http://localhost:8080/api/chrono
+      OPENECOE_SECRET: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
+      OPENECOE_DB_HOST: db
+      OPENECOE_DB_PORT: 3306
+      OPENECOE_DB_USER: openecoe
+      OPENECOE_DB_PASSWORD: openecoe_pass
+      OPENECOE_DB_NAME: openECOE_dev
+      OPENECOE_REDIS_HOST: redis
+      OPENECOE_REDIS_PORT: 6379
+      OPENECOE_REDIS_DB: 0
+      
+      # Usuario por defecto creado la primera vez
       EMAIL: ecoe@umh.es
       PASSWORD: Ki0uchee
       FIRSTNAME: Open
       SURNAME: ECOE
       ORGANIZATION: UMH
       ALEMBIC_UPGRADE: DO
-      RQ_REDIS_URL: 'redis://redis:6379/0'
+
+      # Configruación debug
+      DEBUG: "False"
+      LOG_TO_STDOUT: "False"
+
+      
     depends_on:
       redis:
         condition: service_started
       db:
         condition: service_healthy
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - RELEASE=latest
-    image: openecoe:latest
-    entrypoint: [ "flask", "rq", "worker"]
-    environment:
-      RQ_REDIS_URL: 'redis://redis:6379/0'
-    depends_on:
-      redis:
-        condition: service_started
