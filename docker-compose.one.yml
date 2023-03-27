@@ -4,8 +4,6 @@ services:
     image: redis:latest
   db:
     image: mysql:latest
-    ports:
-      - 8083:3306
     environment:
       MYSQL_ROOT_PASSWORD: openecoe_1234
       MYSQL_DATABASE: openECOE_dev
@@ -20,14 +18,9 @@ services:
       timeout: 5s
       retries: 3
   openecoe:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - RELEASE=latest
-    image: openecoe:latest
+    image: openecoe/one-for-all:latest
     ports:
-      - 8080:80
+      - 8081:80
     environment:
       OPENECOE_SECRET: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
       OPENECOE_DB_HOST: db

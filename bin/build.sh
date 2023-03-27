@@ -3,7 +3,7 @@
 set -eu
 
 # Valores predeterminados
-REPO="openecoe"
+REPO="openecoe/one-for-all"
 RELEASE="$(date '+%Y-%m-%d')"
 ADDITIONAL_TAGS=()
 
