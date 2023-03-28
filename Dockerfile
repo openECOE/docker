@@ -1,4 +1,4 @@
-ARG RELEASE
+ARG RELEASE=latest
 FROM openecoe/webui:$RELEASE AS webui
 FROM openecoe/api:$RELEASE AS api
 FROM nginx

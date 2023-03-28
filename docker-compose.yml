@@ -2,69 +2,50 @@ version: '3'
 services:
   redis:
     image: redis:latest
-  mysql:
+  db:
     image: mysql:latest
-    ports:
-      - 8083:3306
     environment:
       MYSQL_ROOT_PASSWORD: openecoe_1234
-      MYSQL_DATABASE: openECOE_dev
+      MYSQL_DATABASE: openECOE
       MYSQL_USER: openecoe
-      MYSQL_PASSWORD: openecoe
-    volumes:
-      - ./deploy/data:/docker-entrypoint-initdb.d
+      MYSQL_PASSWORD: openecoe_pass
     cap_add:
       - SYS_NICE
     healthcheck:
       test: "mysqladmin ping -p$$MYSQL_ROOT_PASSWORD"
       timeout: 5s
       retries: 3
-  api:
-    image: openecoe/api:latest
+  openecoe:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: openecoe/one-for-all:latest
     ports:
-      - 8081:5000
+      - 8081:80
     environment:
-      # Data for first run if no organization created
+      OPENECOE_SECRET: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
+      OPENECOE_DB_HOST: db
+      OPENECOE_DB_PORT: 3306
+      OPENECOE_DB_USER: openecoe
+      OPENECOE_DB_PASSWORD: openecoe_pass
+      OPENECOE_DB_NAME: openECOE
+      OPENECOE_REDIS_HOST: redis
+      OPENECOE_REDIS_PORT: 6379
+      OPENECOE_REDIS_DB: 0
+      
+      # Usuario por defecto creado la primera vez
       EMAIL: ecoe@umh.es
-      PASSWORD: Ki0uchee
+      PASSWORD: Kui0chee
       FIRSTNAME: Open
       SURNAME: ECOE
       ORGANIZATION: UMH
-      #API Configuration
-      SERVER_NAME: openecoe
-      SECRET_KEY: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
-      BCRYPT_LOG_ROUNDS: 4
+      ALEMBIC_UPGRADE: DO
+
+      # Configruación debug
       DEBUG: "False"
-      TESTING: "False"
-      LOG_TO_STDOUT: "True"
-      SQLALCHEMY_TRACK_MODIFICATIONS: "False"
-      API_AUTH: "True"
-      SQLALCHEMY_DATABASE_URI: mysql+pymysql://openecoe:openecoe@mysql/openECOE_dev
-      RQ_REDIS_URL: redis://redis:6379/0
+      LOG_TO_STDOUT: "False"
     depends_on:
       redis:
         condition: service_started
-      mysql:
+      db:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/status/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-  worker:
-    image: openecoe/api:latest
-    entrypoint: [ "flask", "rq", "worker"]
-    environment:
-      RQ_REDIS_URL: redis://redis:6379/0
-    depends_on:
-      api:
-        condition: service_healthy
-  web:
-    image: openecoe/webui:latest
-    environment:
-      SECRET_KEY: eiQuain4_aelohKa3_giGh6Fai_reeTh6Ai_Aegeic6l_ekuigo0M_aeph6Qua_uuZaac5n
-      DEBUG: "True"
-      API_URL: http://localhost:8081
-      CHRONO_ROUTE: http://localhost:8081/chrono
-    ports:
-      - 8080:80
