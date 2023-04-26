@@ -16,7 +16,7 @@ ENV FLASK_ENV = production
 ENV FLASK_DEBUG = 0
 
 COPY --from=webui /usr/share/nginx/html /usr/share/nginx/html
-COPY --from=webui /docker-entrypoint.d/90-envsubst-on-webui.sh /docker-entrypoint.d/90-envsubst-on-webui.sh
+COPY --from=webui /docker-entrypoint.d/90-envsubst-on-webui.sh /docker-entrypoint.d/70-envsubst-on-webui.sh
 
 COPY --from=api /app/api /app/api
 ENV PATH=/app/api/env/bin:$PATH
