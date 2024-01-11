@@ -1,11 +1,11 @@
 ARG RELEASE=latest
 FROM openecoe/webui:$RELEASE AS webui
 FROM openecoe/api:$RELEASE AS api
-FROM nginx
+FROM nginx:1.24
 
 RUN apt-get update \
-  && apt-get install -y python3  netbase \
-  && rm -rf /var/lib/apt/lists/*  
+   && apt-get install -y python3  netbase \
+   && rm -rf /var/lib/apt/lists/*  
 
 ENV ALEMBIC_UPGRADE=DO
 
