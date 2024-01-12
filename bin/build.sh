@@ -5,6 +5,8 @@ set -eu
 # Valores predeterminados
 REPO="openecoe/one-for-all"
 RELEASE="$(date '+%Y-%m-%d')"
+API_VERSION="latest"
+WEBUI_VERSION="latest"
 ADDITIONAL_TAGS=()
 
 # Analizar las opciones y argumentos con nombre
@@ -19,15 +21,21 @@ while getopts "r:R:t:" opt; do
     t)
       ADDITIONAL_TAGS+=("$OPTARG")
       ;;
+    api)
+      API_VERSION="$OPTARG"
+      ;;
+    web)
+      WEBUI_VERSION="$OPTARG"
+      ;;
     *)
-      echo "Uso: $0 [-r repo] [-R release] [-t additional_tag]..."
+      echo "Uso: $0 [-r repo] [-R release] [-api versionAPI] [-web versionWEBUI] [-t additional_tag]..."
       exit 1
       ;;
   esac
 done
 
 # Construir la imagen de Docker
-docker build -t "$REPO:$RELEASE" --build-arg RELEASE=$RELEASE .
+docker build -t "$REPO:$RELEASE" --build-arg API_VERSION=$API_VERSION WEBUI_VERSION=$WEBUI_VERSION .
 
 # Etiquetar la imagen de Docker
 for tag in "${ADDITIONAL_TAGS[@]}"; do

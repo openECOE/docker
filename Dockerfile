@@ -1,6 +1,7 @@
-ARG RELEASE=latest
-FROM openecoe/webui:$RELEASE AS webui
-FROM openecoe/api:$RELEASE AS api
+ARG API_VERSION=latest
+ARG WEBUI_VERSION=latest
+FROM openecoe/webui:$WEBUI_VERSION AS webui
+FROM openecoe/api:$API_VERSION AS api
 FROM nginx:1.24
 
 RUN apt-get update \
