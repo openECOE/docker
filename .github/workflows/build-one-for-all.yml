@@ -1,6 +1,8 @@
 name: Build OpenECOE One For All
 
 on:
+  repository_dispatch:
+    types: [build-one-for-all]
   workflow_dispatch:
     inputs:
       project:
