@@ -10,11 +10,7 @@ on:
       branch:
         description: 'Nombre de la rama que invoca el build'
         required: true
-        default: 'master'
-      tags:
-        description: 'Tags separados por comas'
-        required: false
-        default: 'v1.0.0'
+        default: 'develop'
 permissions:
   contents: read
 
@@ -63,31 +59,20 @@ jobs:
             type=pep440,pattern={{version}},event=tag
             type=ref,event=branch
 
-      - name: Set Tag Name
+      - name: Determine release tag based on GitHub event
         id: set_tag
         shell: bash
         env:
-          INPUT_TAGS: ${{ github.event.inputs.tags }}
           INPUT_BRANCH: ${{ github.event.inputs.branch }}
           INPUT_PROJECT: ${{ github.event.inputs.project }}
         run: |
-          if [[ -n "$INPUT_TAGS" ]]; then
-            TAG="$INPUT_TAGS"
-          elif [[ "INPUT_BRANCH" == "master" ]]; then
+          if [[ "INPUT_BRANCH" == "master" ]]; then
             TAG="latest"
           else
             TAG="$INPUT_BRANCH"
           fi
-          echo "tag=$INPUT_PROJECT-$TAG" >> $GITHUB_OUTPUT
-
-      - name: Determine release tag based on GitHub event
-        id: release_tag
-        run: |
-            if [[ "${{ github.event.inputs.branch }}" == "uat" ]]; then
-              echo "tag=uat" >> $GITHUB_OUTPUT
-            else
-              echo "tag=latest" >> $GITHUB_OUTPUT
-            fi
+          echo "project_tag=$INPUT_PROJECT-$TAG" >> $GITHUB_OUTPUT
+          echo "tag"=$TAG >> $GITHUB_OUTPUT
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -99,8 +84,8 @@ jobs:
           file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: | 
-            openecoe/one-for-all:${{ steps.release_tag.outputs.tag }}
             openecoe/one-for-all:${{ steps.set_tag.outputs.tag }}
+            openecoe/one-for-all:${{ steps.set_tag.outputs.project_tag }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
