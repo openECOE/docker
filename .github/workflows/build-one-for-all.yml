@@ -58,7 +58,6 @@ jobs:
           tags: |
             type=pep440,pattern={{version}},event=tag
             type=ref,event=branch
-            type=manual,value=${{ github.event.inputs.tags }}
 
       - name: Set Tag Name
         id: set_tag
