@@ -4,15 +4,6 @@ on:
   repository_dispatch:
     types: [build-one-for-all]
   workflow_dispatch:
-    inputs:
-      project:
-        description: 'Nombre del proyecto que invoca el build'
-        required: true
-        default: 'docker'
-      branch:
-        description: 'Nombre de la rama que invoca el build'
-        required: true
-        default: 'develop'
 permissions:
   contents: read
 
@@ -65,15 +56,13 @@ jobs:
         id: set_tag
         shell: bash
         env:
-          INPUT_BRANCH: ${{ github.event.inputs.branch }}
-          INPUT_PROJECT: ${{ github.event.inputs.project }}
+          INPUT_BRANCH: ${{ github.ref_name }}
         run: |
           if [[ "INPUT_BRANCH" == "master" ]]; then
             TAG="latest"
           else
             TAG="$INPUT_BRANCH"
           fi
-          echo "project_tag=$INPUT_PROJECT-$TAG" >> $GITHUB_OUTPUT
           echo "tag"=$TAG >> $GITHUB_OUTPUT
 
       # Build and push Docker image with Buildx (don't push on PR)
