@@ -4,6 +4,18 @@ on:
   repository_dispatch:
     types: [build-one-for-all]
   workflow_dispatch:
+  push:
+    branches: 
+      - "master"
+      - "develop"
+      - "uat"
+    # Publish semver tags as releases.
+    tags:
+      - 'v*'
+  pull_request:
+    branches: 
+      - "master"
+      - "uat"
 permissions:
   contents: read
 
