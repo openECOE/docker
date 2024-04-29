@@ -8,7 +8,7 @@ on:
       project:
         description: 'Nombre del proyecto que invoca el build'
         required: true
-        default: 'api'
+        default: 'docker'
       branch:
         description: 'Nombre de la rama que invoca el build'
         required: true
@@ -87,7 +87,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: | 
             openecoe/one-for-all:${{ steps.set_tag.outputs.tag }}
-            openecoe/one-for-all:${{ steps.set_tag.outputs.project_tag }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
