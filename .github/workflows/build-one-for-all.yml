@@ -4,6 +4,18 @@ on:
   repository_dispatch:
     types: [build-one-for-all]
   workflow_dispatch:
+  push:
+    branches: 
+      - "master"
+      - "develop"
+      - "uat"
+    # Publish semver tags as releases.
+    tags:
+      - 'v*'
+  pull_request:
+    branches: 
+      - "master"
+      - "uat"
 permissions:
   contents: read
 
@@ -58,10 +70,10 @@ jobs:
         env:
           INPUT_BRANCH: ${{ github.ref_name }}
         run: |
-          if [[ "INPUT_BRANCH" == "master" ]]; then
+          if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
             TAG="latest"
           else
-            TAG="$INPUT_BRANCH"
+            TAG="${GITHUB_REF_NAME}"
           fi
           echo "tag"=$TAG >> $GITHUB_OUTPUT
 
@@ -79,3 +91,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            API_VERSION=${{ steps.set_tag.outputs.tag }}
+            WEBUI_VERSION=${{ steps.set_tag.outputs.tag }}
