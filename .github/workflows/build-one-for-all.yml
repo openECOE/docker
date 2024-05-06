@@ -70,10 +70,10 @@ jobs:
         env:
           INPUT_BRANCH: ${{ github.ref_name }}
         run: |
-          if [[ "INPUT_BRANCH" == "master" ]]; then
+          if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
             TAG="latest"
           else
-            TAG="$INPUT_BRANCH"
+            TAG="${GITHUB_REF_NAME}"
           fi
           echo "tag"=$TAG >> $GITHUB_OUTPUT
 
