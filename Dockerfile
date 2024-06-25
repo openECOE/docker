@@ -5,7 +5,7 @@ FROM openecoe/api:$API_VERSION AS api
 FROM nginx:1.24
 
 RUN apt-get update \
-   && apt-get install -y python3  netbase \
+   && apt-get install -y python3  netbase wkhtmltopdf \
    && rm -rf /var/lib/apt/lists/*  
 
 ENV ALEMBIC_UPGRADE=DO
